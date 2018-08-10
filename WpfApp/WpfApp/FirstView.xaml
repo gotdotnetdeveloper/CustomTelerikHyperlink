@@ -1,0 +1,44 @@
+﻿<UserControl x:Class="WpfApp.FirstView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:WpfApp"
+             xmlns:telerik="http://schemas.telerik.com/2008/xaml/presentation"
+             mc:Ignorable="d" 
+             d:DesignHeight="450" d:DesignWidth="800">
+    <UserControl.DataContext>
+        <local:FirstViewModel />
+    </UserControl.DataContext>
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+
+
+
+        <StackPanel Grid.Row="0" Orientation="Vertical" Margin="10" VerticalAlignment="Center">
+            <Label Height="50"></Label>
+            <Button Height="20" Command="{Binding SaveCommand}">SaveCommand</Button>
+            <Button Height="20" Command="{Binding LoadCommand}">LoadCommand</Button>
+            <Button Height="20" Command="{Binding InsertLinkCommand}">InsertLinkCommand</Button>
+        </StackPanel>
+
+        <!--основная инфа https://docs.telerik.com/devtools/wpf/controls/radrichtextbox/features/document-elements-hyperlink#hyperlinkinfo-->
+
+        <!--если нужно без контрклика https://www.telerik.com/forums/open-hyperlink-without-control-key-->
+
+        <!--HyperlinkToolTipFormatString=""
+        HyperlinkPattern=""-->
+
+        <telerik:RadRichTextBox
+                x:Name="RrtbDocViewEdit"
+                Grid.Row="1"
+            HyperlinkNavigationMode="Click"
+            AutoInsertHyperlinks="True"
+            
+                local:RadDocumentBindProperty.BindDocument="{Binding DocumentData}"
+                LayoutMode="Paged" />
+    </Grid>
+</UserControl>
