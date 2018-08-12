@@ -318,9 +318,9 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="OpenLinkContext.cs" />
     <Compile Include="RadDocumentBindProperty.cs" />
     <Compile Include="RadRichTextBoxBehavior.cs" />
-    <Compile Include="TestBehavior.cs" />
     <Page Include="FirstView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>

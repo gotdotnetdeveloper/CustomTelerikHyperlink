@@ -26,36 +26,17 @@
             <Button Height="20" Command="{Binding InsertLinkCommand}">InsertLinkCommand</Button>
         </StackPanel>
 
-        <!--основная инфа https://docs.telerik.com/devtools/wpf/controls/radrichtextbox/features/document-elements-hyperlink#hyperlinkinfo-->
-
         <!-- Поиск гиперлинков  https://www.telerik.com/forums/how-to-modify-hyperlinks -->
-
-        <!--RadDocumentDefaultStyles.HyperlinkStyleName-->
-
-        <!--this.HyperlinkToolTipFormatString = LocalizationManager.GetString("Documents_RadRichTextBox_HyperlinkToolTipFormatString");-->
-
-        <!--HyperlinkToolTipFormatString=""
-        {Telerik.Windows.Documents.Model.Span}
-        ((Telerik.Windows.Documents.Model.DocumentElement)sender).Parent.Parent.Parent
-        
-        {Telerik.Windows.Documents.Model.RadDocument}
-        
-        local:RadRichTextBoxBehavior.DoubleClickAction="{Binding OpenLinkCommand}"
-        
-        HyperlinkPattern=""-->
-        <!--HyperlinkToolTipFormatString="{}{1} to follow link."-->
         <telerik:RadRichTextBox
                 x:Name="RrtbDocViewEdit" Grid.Row="1"
             HyperlinkNavigationMode="Click"
             HyperlinkToolTipFormatString="{}{1} для перехода."
-            
               local:RadDocumentBindProperty.BindDocument="{Binding DocumentData}"
                 LayoutMode="Paged" >
             <i:Interaction.Behaviors>
-                <local:TestBehavior/>
+                <local:RadRichTextBoxBehavior HyperlinkAction="{Binding OpenLinkCommand}"  />
             </i:Interaction.Behaviors>
 
-         
 
         </telerik:RadRichTextBox>
     </Grid>

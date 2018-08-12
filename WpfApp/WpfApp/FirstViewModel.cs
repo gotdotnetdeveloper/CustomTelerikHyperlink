@@ -6,6 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Media;
+using System.Xml.Serialization;
 using GalaSoft.MvvmLight.Command;
 using Telerik.Windows.Controls;
 using Telerik.Windows.Documents;
@@ -19,11 +20,26 @@ namespace WpfApp
 {
     class FirstViewModel : ViewModelBase
     {
+        #region private proprty
         private RadDocument _documentData = new RadDocument();
         private RelayCommand _ExportCommand;
         private RelayCommand _importCommand;
         private RelayCommand _insertLinkCommand;
         private RelayCommand<string> _OpenLinkCommand;
+        #endregion
+
+        /// <summary>
+        /// Содержимое документа.
+        /// </summary>
+        public RadDocument DocumentData
+        {
+            get => _documentData;
+            set
+            {
+                _documentData = value;
+                RaisePropertyChanged();
+            }
+        }
 
         #region Save
         public RelayCommand SaveCommand => _ExportCommand ?? (_ExportCommand = new RelayCommand(ExportDoumentsCommandExecute));
@@ -45,7 +61,14 @@ namespace WpfApp
         public RelayCommand InsertLinkCommand => _insertLinkCommand ?? (_insertLinkCommand = new RelayCommand(InsertLinkCommandExecute));
         private void InsertLinkCommandExecute()
         {
-            InsertLink();
+            var newContext = new OpenLinkContext();
+            newContext.Id = Guid.NewGuid();
+            newContext.Type = 2;
+            newContext.Text = "Тестовый ''❸''  '№;%:?*(@#$%^&*0.;'текст";
+
+          
+
+            InsertLink(newContext);
         }
 
 
@@ -57,92 +80,39 @@ namespace WpfApp
 
         private void OpenLinkCommandExecute(string obj)
         {
-            if(obj!= null)
-                MessageBox.Show(obj);
+            if (obj != null)
+            {
+                var o = GetDeserializedObject<OpenLinkContext>(obj);
+                MessageBox.Show(o.Text);
+            }
+                
         }
-
-        private void OpenLinkCommandExecute()
-        {
-            OpenLink();
-        }
-
-
 
         #endregion
 
-        private void OpenLink()
-        {
 
-        }
+        #region private method
 
-        private void InsertLink()
+        private void InsertLink(OpenLinkContext newContext)
         {
+            var txt = GetSerializedObject(newContext);
             var range = DocumentData.Selection.Ranges.First;
             if (range != null)
             {
                 HyperlinkRangeStart hyperlinkStart = new HyperlinkRangeStart();
-                
                 HyperlinkRangeEnd hyperlinkEnd = new HyperlinkRangeEnd();
                 hyperlinkEnd.PairWithStart(hyperlinkStart);
                 HyperlinkInfo hyperlinkInfo = new HyperlinkInfo()
                 {
-                    NavigateUri = "http://telerik.com", Target = HyperlinkTargets.Self, IsAnchor = true
-                    
-
+                    NavigateUri = txt,
+                    Target = HyperlinkTargets.Self,
+                    IsAnchor = true
                 };
                 hyperlinkStart.HyperlinkInfo = hyperlinkInfo;
-
-                StyleDefinition style = new StyleDefinition();
-                style.IsCustom = true;
-                style.DisplayName = "DisplayName";
-             
-                
-
-
-                //[Obsolete("Use RadDocumentEditor.InsertHyperlink method instead.")]
-                //DocumentPosition startPosition, DocumentPosition endPosition, HyperlinkInfo hyperlinkInfo
                 RadDocumentEditor documentEditor = new RadDocumentEditor(DocumentData);
-                //documentEditor.InsertHyperlink(range.StartPosition, range.EndPosition ,info);
-
-                //The parameter hyperlinkStyle is not used. The document hyperlink style will be used instead
-
-                
-
-                documentEditor.InsertHyperlink(hyperlinkInfo, style);
-
+                documentEditor.InsertHyperlink(hyperlinkInfo);
             }
         }
-
-
-        private void f()
-        {
-            HyperlinkRangeStart hyperlinkStart = new HyperlinkRangeStart();
-            HyperlinkRangeEnd hyperlinkEnd = new HyperlinkRangeEnd();
-            hyperlinkEnd.PairWithStart(hyperlinkStart);
-
-            HyperlinkInfo hyperlinkInfo = new HyperlinkInfo() { NavigateUri = "http://telerik.com", Target = HyperlinkTargets.Blank };
-            hyperlinkStart.HyperlinkInfo = hyperlinkInfo;
-            RadDocument document = new RadDocument();
-            Section section = new Section();
-            Paragraph paragraph = new Paragraph();
-            Span spanBefore = new Span("Text before the image ");
-            ImageInline image = new ImageInline(new Uri("/Telerik.Windows.Controls.RichTextBoxUI;component/Images/MSOffice/32/Picture.png", UriKind.Relative));
-            image.Size = new Size(32, 32);
-            Span spanAfter = new Span(" and some text after the image");
-            paragraph.Inlines.Add(hyperlinkStart);
-            paragraph.Inlines.Add(spanBefore);
-            paragraph.Inlines.Add(image);
-            paragraph.Inlines.Add(spanAfter);
-            section.Blocks.Add(paragraph);
-            Paragraph anotherParagraph = new Paragraph();
-            anotherParagraph.Inlines.Add(new Span("Another paragraph here and still in hyperlink"));
-            anotherParagraph.Inlines.Add(hyperlinkEnd);
-            section.Blocks.Add(anotherParagraph);
-            document.Sections.Add(section);
-          //  this.richTextBox.Document = document;
-
-        }
-
 
         private void LoaderDocument()
         {
@@ -182,18 +152,36 @@ namespace WpfApp
             }
         }
 
-
         /// <summary>
-        /// Содержимое документа.
+        /// Преобразование объекта в XML представление.
         /// </summary>
-        public RadDocument DocumentData
+        /// <typeparam name="T">Тип объекта.</typeparam>
+        /// <param name="obj">Экземпляр объекта.</param>
+        /// <returns>Сериализованное представление.</returns>
+        private string GetSerializedObject<T>(T obj)
         {
-            get => _documentData;
-            set
+            XmlSerializer serializer = new XmlSerializer(typeof(T));
+            using (StringWriter textWriter = new StringWriter())
             {
-                _documentData = value;
-                RaisePropertyChanged();
+                serializer.Serialize(textWriter, obj);
+                return textWriter.ToString();
             }
         }
+        /// <summary>
+        /// Преобразование строки XML в объект.
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="xmlText"></param>
+        /// <returns></returns>
+        private T GetDeserializedObject<T>(string xmlText)
+        {
+            XmlSerializer deserializer = new XmlSerializer(typeof(T));
+            using (StringReader textReader = new StringReader(xmlText))
+            {
+                var result = deserializer.Deserialize(textReader);
+                return (T)result;
+            }
+        }
+        #endregion
     }
 }

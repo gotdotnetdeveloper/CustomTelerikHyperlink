@@ -1,113 +1,77 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Controls;
 using System.Windows.Input;
-using System.Xml.Serialization;
+using System.Windows.Interactivity;
+using GalaSoft.MvvmLight.Command;
 using Telerik.Windows.Controls;
-using Telerik.Windows.Controls.GridView;
 using Telerik.Windows.Documents.Model;
 
 namespace WpfApp
 {
+
     /// <summary>
-    /// Расширяет поведение RadRichTextBox.
+    /// Расширение функциональности RadRichTextBox. Кастомная обработка клика по гиперссылки в документе.
     /// </summary>
-    public static class RadRichTextBoxBehavior
+    public class RadRichTextBoxBehavior : Behavior<RadRichTextBox>
     {
         /// <summary>
-        /// Команда на двойное нажатие.
+        /// DependencyProperty клика по гиперлинку.
         /// </summary>
-        public static readonly DependencyProperty DoubleClickActionProperty =
-            DependencyProperty.RegisterAttached("DoubleClickAction", typeof(ICommand), typeof(RadRichTextBoxBehavior),
-                new UIPropertyMetadata(null, OnDoubleClickActionChanged));
+        public static readonly DependencyProperty HyperlinkActionProperty =
+            DependencyProperty.RegisterAttached("HyperlinkAction", typeof(ICommand), typeof(RadRichTextBoxBehavior),
+                new UIPropertyMetadata(null, null));
 
-       
         /// <summary>
-        /// Возвращает DefaultAction для грида.
+        /// Изменилось DependencyProperty.
         /// </summary>
-        /// <param name="grid"></param>
-        /// <returns></returns>
-        public static ICommand GetDoubleClickAction(RadRichTextBox grid)
+        private static void OnHyperlinkClickedChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
-            return grid.GetValue(DoubleClickActionProperty) as ICommand;
+            if (!(d is RadRichTextBox grid)) return;
         }
 
         /// <summary>
-        /// Устанавливает DefaultAction для грида.
+        /// Команда, которая обрабатывает клик по гиперссылки
         /// </summary>
-        public static void SetDoubleClickAction(RadRichTextBox grid, ICommand value)
+        public ICommand HyperlinkAction
         {
-            grid.SetValue(DoubleClickActionProperty, value);
+            get => (ICommand)GetValue(HyperlinkActionProperty);
+            set => SetValue(HyperlinkActionProperty, value);
         }
 
-        private static void OnDoubleClickActionChanged(DependencyObject depObj, DependencyPropertyChangedEventArgs e)
+        /// <summary>
+        /// Подключение расширенной функциональности для RadRichTextBox.
+        /// </summary>
+        protected override void OnAttached()
         {
-            if (!(depObj is RadRichTextBox grid)) return;
+            AssociatedObject.HyperlinkClicked += OnHyperlinkClicked;
+        }
 
-            if (!(e.NewValue is ICommand))
+        /// <summary>
+        /// Отключение расширенной функциональности для RadRichTextBox.
+        /// </summary>
+        protected override void OnDetaching()
+        {
+            AssociatedObject.HyperlinkClicked -= OnHyperlinkClicked;
+        }
+
+        /// <summary>
+        /// Обработчик клика по гиперссылки. Запускает команду, перехватывает событие.
+        /// </summary>
+        private void OnHyperlinkClicked(object sender, HyperlinkClickedEventArgs e)
+        {
+            if (GetValue(HyperlinkActionProperty) is ICommand comm)
             {
-                grid. HyperlinkClicked  -= OnHyperlinkClicked;
+                if (comm.CanExecute(e.URL))
+                {
+                    comm.Execute(e.URL);
+                    e.Handled = true;
+                }
             }
-            else if (!(e.OldValue is ICommand))
-            {
-                grid.HyperlinkClicked += OnHyperlinkClicked;
-            }
         }
-
-        private static void OnHyperlinkClicked(object sender, HyperlinkClickedEventArgs e)
-        {
-            var s = sender as Telerik.Windows.Documents.Model.Span;
-            var parent = ((Telerik.Windows.Documents.Model.DocumentElement) sender).Parent.Parent.Parent as Telerik.Windows.Documents.Model.RadDocument;
-
-
-            //Telerik.Windows.Documents.Model.Span
-            if (sender is RadRichTextBox grid && PerformDoubleClickAction(grid, e.URL))
-                e.Handled = true;
-        }
-
-        private static bool PerformDoubleClickAction(RadRichTextBox grid, string url)
-        {
-            var cmd = GetDoubleClickAction(grid);
-            if (cmd == null || !cmd.CanExecute(url)) return false;
-
-            cmd.Execute(url);
-
-            return true;
-        }
-
-
-        //private static void OnGridMouseDoubleClick(object sender, MouseButtonEventArgs e)
-        //{
-        //    // Для начала нужно проверить, что это левая кнопка, а потом уже все остальное
-        //    if (e.ChangedButton != MouseButton.Left) return;
-        //    var clickedElement = (DependencyObject)e.OriginalSource;
-        //    while (clickedElement is FrameworkContentElement)
-        //        clickedElement = ((FrameworkContentElement)clickedElement).Parent;
-
-        //    // Проверяем, что кликали на строке грида
-        //    if (clickedElement.ParentOfType<GridViewRow>() == null) return;
-        //    if (sender is RadRichTextBox grid && PerformDoubleClickAction(grid)) e.Handled = true;
-        //}
-
-
-        ///// <summary>
-        ///// Преобразование объекта в XML представление.
-        ///// </summary>
-        ///// <typeparam name="T">Тип объекта.</typeparam>
-        ///// <param name="obj">Экземпляр объекта.</param>
-        ///// <returns>Сериализованное представление.</returns>
-        //private static string GetSerializedObject<T>(T obj)
-        //{
-        //    XmlSerializer serializer = new XmlSerializer(typeof(T));
-        //    using (StringWriter textWriter = new StringWriter())
-        //    {
-        //        serializer.Serialize(textWriter, obj);
-        //        return textWriter.ToString();
-        //    }
-        //}
     }
 }
