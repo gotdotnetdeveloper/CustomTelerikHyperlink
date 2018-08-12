@@ -1,20 +1,20 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
+using System.Xml.Serialization;
 using Telerik.Windows.Controls;
 using Telerik.Windows.Controls.GridView;
 using Telerik.Windows.Documents.Model;
 
 namespace WpfApp
 {
- 
     /// <summary>
-    /// Расширяет поведение грида.
-    /// Добавляет DefaultAction - реакция на Double Click. 
+    /// Расширяет поведение RadRichTextBox.
     /// </summary>
     public static class RadRichTextBoxBehavior
     {
@@ -39,8 +39,6 @@ namespace WpfApp
         /// <summary>
         /// Устанавливает DefaultAction для грида.
         /// </summary>
-        /// <param name="grid"></param>
-        /// <param name="value"></param>
         public static void SetDoubleClickAction(RadRichTextBox grid, ICommand value)
         {
             grid.SetValue(DoubleClickActionProperty, value);
@@ -52,7 +50,7 @@ namespace WpfApp
 
             if (!(e.NewValue is ICommand))
             {
-                grid.HyperlinkClicked  -= OnHyperlinkClicked;
+                grid. HyperlinkClicked  -= OnHyperlinkClicked;
             }
             else if (!(e.OldValue is ICommand))
             {
@@ -62,15 +60,21 @@ namespace WpfApp
 
         private static void OnHyperlinkClicked(object sender, HyperlinkClickedEventArgs e)
         {
-           // e.URL
+            var s = sender as Telerik.Windows.Documents.Model.Span;
+            var parent = ((Telerik.Windows.Documents.Model.DocumentElement) sender).Parent.Parent.Parent as Telerik.Windows.Documents.Model.RadDocument;
+
+
+            //Telerik.Windows.Documents.Model.Span
+            if (sender is RadRichTextBox grid && PerformDoubleClickAction(grid, e.URL))
+                e.Handled = true;
         }
 
         private static bool PerformDoubleClickAction(RadRichTextBox grid, string url)
         {
             var cmd = GetDoubleClickAction(grid);
-            if (cmd == null || !cmd.CanExecute(null)) return false;
+            if (cmd == null || !cmd.CanExecute(url)) return false;
 
-           // cmd.Execute(grid?.SelectedItem);
+            cmd.Execute(url);
 
             return true;
         }
@@ -87,6 +91,23 @@ namespace WpfApp
         //    // Проверяем, что кликали на строке грида
         //    if (clickedElement.ParentOfType<GridViewRow>() == null) return;
         //    if (sender is RadRichTextBox grid && PerformDoubleClickAction(grid)) e.Handled = true;
+        //}
+
+
+        ///// <summary>
+        ///// Преобразование объекта в XML представление.
+        ///// </summary>
+        ///// <typeparam name="T">Тип объекта.</typeparam>
+        ///// <param name="obj">Экземпляр объекта.</param>
+        ///// <returns>Сериализованное представление.</returns>
+        //private static string GetSerializedObject<T>(T obj)
+        //{
+        //    XmlSerializer serializer = new XmlSerializer(typeof(T));
+        //    using (StringWriter textWriter = new StringWriter())
+        //    {
+        //        serializer.Serialize(textWriter, obj);
+        //        return textWriter.ToString();
+        //    }
         //}
     }
 }

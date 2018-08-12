@@ -5,6 +5,7 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:WpfApp"
              xmlns:telerik="http://schemas.telerik.com/2008/xaml/presentation"
+             xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
     <UserControl.DataContext>
@@ -27,18 +28,35 @@
 
         <!--основная инфа https://docs.telerik.com/devtools/wpf/controls/radrichtextbox/features/document-elements-hyperlink#hyperlinkinfo-->
 
-        <!--если нужно без контрклика https://www.telerik.com/forums/open-hyperlink-without-control-key-->
+        <!-- Поиск гиперлинков  https://www.telerik.com/forums/how-to-modify-hyperlinks -->
+
+        <!--RadDocumentDefaultStyles.HyperlinkStyleName-->
+
+        <!--this.HyperlinkToolTipFormatString = LocalizationManager.GetString("Documents_RadRichTextBox_HyperlinkToolTipFormatString");-->
 
         <!--HyperlinkToolTipFormatString=""
+        {Telerik.Windows.Documents.Model.Span}
+        ((Telerik.Windows.Documents.Model.DocumentElement)sender).Parent.Parent.Parent
+        
+        {Telerik.Windows.Documents.Model.RadDocument}
+        
+        local:RadRichTextBoxBehavior.DoubleClickAction="{Binding OpenLinkCommand}"
+        
         HyperlinkPattern=""-->
-
+        <!--HyperlinkToolTipFormatString="{}{1} to follow link."-->
         <telerik:RadRichTextBox
-                x:Name="RrtbDocViewEdit"
-                Grid.Row="1"
+                x:Name="RrtbDocViewEdit" Grid.Row="1"
             HyperlinkNavigationMode="Click"
-            AutoInsertHyperlinks="True"
+            HyperlinkToolTipFormatString="{}{1} для перехода."
             
-                local:RadDocumentBindProperty.BindDocument="{Binding DocumentData}"
-                LayoutMode="Paged" />
+              local:RadDocumentBindProperty.BindDocument="{Binding DocumentData}"
+                LayoutMode="Paged" >
+            <i:Interaction.Behaviors>
+                <local:TestBehavior/>
+            </i:Interaction.Behaviors>
+
+         
+
+        </telerik:RadRichTextBox>
     </Grid>
 </UserControl>

@@ -5,22 +5,25 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Media;
 using GalaSoft.MvvmLight.Command;
 using Telerik.Windows.Controls;
 using Telerik.Windows.Documents;
 using Telerik.Windows.Documents.FormatProviders.OpenXml.Docx;
 using Telerik.Windows.Documents.Layout;
 using Telerik.Windows.Documents.Model;
+using Telerik.Windows.Documents.Model.Styles;
 using ViewModelBase = GalaSoft.MvvmLight.ViewModelBase;
 
 namespace WpfApp
 {
     class FirstViewModel : ViewModelBase
     {
-        private RadDocument _documentData;
+        private RadDocument _documentData = new RadDocument();
         private RelayCommand _ExportCommand;
         private RelayCommand _importCommand;
         private RelayCommand _insertLinkCommand;
+        private RelayCommand<string> _OpenLinkCommand;
 
         #region Save
         public RelayCommand SaveCommand => _ExportCommand ?? (_ExportCommand = new RelayCommand(ExportDoumentsCommandExecute));
@@ -49,23 +52,63 @@ namespace WpfApp
 
         #endregion
 
-   
+       #region OpenLinkCommand
+        public RelayCommand<string> OpenLinkCommand => _OpenLinkCommand ?? (_OpenLinkCommand = new RelayCommand<string>(OpenLinkCommandExecute));
+
+        private void OpenLinkCommandExecute(string obj)
+        {
+            if(obj!= null)
+                MessageBox.Show(obj);
+        }
+
+        private void OpenLinkCommandExecute()
+        {
+            OpenLink();
+        }
+
+
+
+        #endregion
+
+        private void OpenLink()
+        {
+
+        }
 
         private void InsertLink()
         {
             var range = DocumentData.Selection.Ranges.First;
             if (range != null)
             {
-                HyperlinkInfo info = new HyperlinkInfo()
+                HyperlinkRangeStart hyperlinkStart = new HyperlinkRangeStart();
+                
+                HyperlinkRangeEnd hyperlinkEnd = new HyperlinkRangeEnd();
+                hyperlinkEnd.PairWithStart(hyperlinkStart);
+                HyperlinkInfo hyperlinkInfo = new HyperlinkInfo()
                 {
-                    NavigateUri = "https://demos.telerik.com/silverlight/#RichTextBox/TelerikEditor",
-                    Target = HyperlinkTargets.Blank,
-                    IsAnchor = false,
+                    NavigateUri = "http://telerik.com", Target = HyperlinkTargets.Self, IsAnchor = true
+                    
+
                 };
-          
+                hyperlinkStart.HyperlinkInfo = hyperlinkInfo;
+
+                StyleDefinition style = new StyleDefinition();
+                style.IsCustom = true;
+                style.DisplayName = "DisplayName";
+             
+                
+
+
                 //[Obsolete("Use RadDocumentEditor.InsertHyperlink method instead.")]
                 //DocumentPosition startPosition, DocumentPosition endPosition, HyperlinkInfo hyperlinkInfo
-            var newLink =    DocumentData.InsertHyperlink(range.StartPosition, range.EndPosition ,info);
+                RadDocumentEditor documentEditor = new RadDocumentEditor(DocumentData);
+                //documentEditor.InsertHyperlink(range.StartPosition, range.EndPosition ,info);
+
+                //The parameter hyperlinkStyle is not used. The document hyperlink style will be used instead
+
+                
+
+                documentEditor.InsertHyperlink(hyperlinkInfo, style);
 
             }
         }
@@ -76,6 +119,7 @@ namespace WpfApp
             HyperlinkRangeStart hyperlinkStart = new HyperlinkRangeStart();
             HyperlinkRangeEnd hyperlinkEnd = new HyperlinkRangeEnd();
             hyperlinkEnd.PairWithStart(hyperlinkStart);
+
             HyperlinkInfo hyperlinkInfo = new HyperlinkInfo() { NavigateUri = "http://telerik.com", Target = HyperlinkTargets.Blank };
             hyperlinkStart.HyperlinkInfo = hyperlinkInfo;
             RadDocument document = new RadDocument();
@@ -123,7 +167,7 @@ namespace WpfApp
             string fileName = "";
             RadSaveFileDialog saveFileDialog = new RadSaveFileDialog
             {
-                Filter = "Рубрикатор (*.docx)|*.docx" +
+                Filter = "Document (*.docx)|*.docx" +
                          "|Все файлы (*.*)|*.*",
                 FilterIndex = 1,
             };

@@ -34,9 +34,6 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="CommonServiceLocator, Version=2.0.2.0, Culture=neutral, PublicKeyToken=489b6accfaf20ef0, processorArchitecture=MSIL">
-      <HintPath>..\packages\CommonServiceLocator.2.0.2\lib\net45\CommonServiceLocator.dll</HintPath>
-    </Reference>
     <Reference Include="GalaSoft.MvvmLight, Version=5.4.1.0, Culture=neutral, PublicKeyToken=e7570ab207bcb616, processorArchitecture=MSIL">
       <HintPath>..\packages\MvvmLightLibs.5.4.1\lib\net45\GalaSoft.MvvmLight.dll</HintPath>
     </Reference>
@@ -79,9 +76,6 @@
     <Reference Include="Telerik.Pivot.DataProviders.Xmla, Version=2018.2.620.45, Culture=neutral, PublicKeyToken=5803cfa389c90ce7, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\..\..\Telerik UI for WPF R1 2018\Binaries\WPF45\Telerik.Pivot.DataProviders.Xmla.dll</HintPath>
-    </Reference>
-    <Reference Include="Telerik.Windows.Analytics">
-      <HintPath>..\..\..\..\Telerik UI for WPF R1 2018\Binaries\WPF45\Telerik.Windows.Analytics.dll</HintPath>
     </Reference>
     <Reference Include="Telerik.Windows.Cloud, Version=2018.2.620.45, Culture=neutral, PublicKeyToken=5803cfa389c90ce7, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
@@ -326,6 +320,7 @@
     </ApplicationDefinition>
     <Compile Include="RadDocumentBindProperty.cs" />
     <Compile Include="RadRichTextBoxBehavior.cs" />
+    <Compile Include="TestBehavior.cs" />
     <Page Include="FirstView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
