@@ -30,7 +30,7 @@
         <telerik:RadRichTextBox
                 x:Name="RrtbDocViewEdit" Grid.Row="1"
             HyperlinkNavigationMode="Click"
-            HyperlinkToolTipFormatString="{}{1} для перехода."
+            HyperlinkToolTipFormatString="{}Нажмите {1}, для перехода."
               local:RadDocumentBindProperty.BindDocument="{Binding DocumentData}"
                 LayoutMode="Paged" >
             <i:Interaction.Behaviors>

@@ -1,19 +1,11 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
-using System.Windows.Media;
 using System.Xml.Serialization;
 using GalaSoft.MvvmLight.Command;
 using Telerik.Windows.Controls;
-using Telerik.Windows.Documents;
 using Telerik.Windows.Documents.FormatProviders.OpenXml.Docx;
-using Telerik.Windows.Documents.Layout;
 using Telerik.Windows.Documents.Model;
-using Telerik.Windows.Documents.Model.Styles;
 using ViewModelBase = GalaSoft.MvvmLight.ViewModelBase;
 
 namespace WpfApp
@@ -65,14 +57,8 @@ namespace WpfApp
             newContext.Id = Guid.NewGuid();
             newContext.Type = 2;
             newContext.Text = "Тестовый ''❸''  '№;%:?*(@#$%^&*0.;'текст";
-
-          
-
             InsertLink(newContext);
         }
-
-
-
         #endregion
 
        #region OpenLinkCommand

@@ -26,13 +26,6 @@ namespace WpfApp
             DependencyProperty.RegisterAttached("HyperlinkAction", typeof(ICommand), typeof(RadRichTextBoxBehavior),
                 new UIPropertyMetadata(null, null));
 
-        /// <summary>
-        /// Изменилось DependencyProperty.
-        /// </summary>
-        private static void OnHyperlinkClickedChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
-        {
-            if (!(d is RadRichTextBox grid)) return;
-        }
 
         /// <summary>
         /// Команда, которая обрабатывает клик по гиперссылки
